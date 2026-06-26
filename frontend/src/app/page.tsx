@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 import { useState, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Navbar from '@/components/Navbar'
@@ -20,17 +20,17 @@ const WaveformIcon = ({ color = '#6C63FF', animated = false }: { color?: string;
 )
 
 const features = [
-  { icon: '🎙', title: 'Isolated Vocals', desc: 'Crystal-clear vocal extraction powered by Meta Demucs neural network.' },
-  { icon: '🎛', title: 'Clean Instrumental', desc: 'Full backing track with vocals completely removed, not just filtered.' },
-  { icon: '🎬', title: 'Video Support', desc: 'Upload MP4 videos and get back a video with vocals removed or isolated.' },
-  { icon: '⚡', title: 'Fast Processing', desc: 'Most tracks processed in under 3 minutes on CPU, faster on GPU.' },
-  { icon: '🎵', title: 'Multiple Formats', desc: 'Upload MP3, WAV, MP4, MOV, AVI. We handle conversion automatically.' },
-  { icon: '🔒', title: 'Private & Secure', desc: 'Your files are processed locally and deleted after download.' },
+  { icon: '??', title: 'Isolated Vocals', desc: 'Crystal-clear vocal extraction powered by Meta Demucs neural network.' },
+  { icon: '??', title: 'Clean Instrumental', desc: 'Full backing track with vocals completely removed, not just filtered.' },
+  { icon: '??', title: 'Video Support', desc: 'Upload MP4 videos and get back a video with vocals removed or isolated.' },
+  { icon: '?', title: 'Fast Processing', desc: 'Most tracks processed in under 3 minutes on CPU, faster on GPU.' },
+  { icon: '??', title: 'Multiple Formats', desc: 'Upload MP3, WAV, MP4, MOV, AVI. We handle conversion automatically.' },
+  { icon: '??', title: 'Private & Secure', desc: 'Your files are processed locally and deleted after download.' },
 ]
 
 const team = [
   { name: 'Built on Demucs', role: 'Meta AI Research', desc: 'State-of-the-art music source separation model used by audio professionals worldwide.' },
-  { name: 'Open Source', role: 'Transparent Technology', desc: 'Powered by open-source AI — no black boxes, no hidden processing.' },
+  { name: 'Open Source', role: 'Transparent Technology', desc: 'Powered by open-source AI � no black boxes, no hidden processing.' },
   { name: 'No Account Needed', role: 'Privacy First', desc: 'Upload, process, download. No sign-up, no tracking, no data retention.' },
 ]
 
@@ -82,7 +82,7 @@ export default function Home() {
     try {
       const formData = new FormData()
       formData.append('file', file)
-      const res = await fetch('http://127.0.0.1:8000/upload', { method: 'POST', body: formData })
+      const res = await fetch('${process.env.NEXT_PUBLIC_API_URL}/upload', { method: 'POST', body: formData })
       if (!res.ok) { const err = await res.json(); throw new Error(err.detail || 'Upload failed') }
       const { job_id } = await res.json()
       router.push(`/processing?job_id=${job_id}`)
@@ -181,7 +181,7 @@ export default function Home() {
             />
             {!file ? (
               <>
-                <div style={{ fontSize: 36, marginBottom: 12 }}>🎵</div>
+                <div style={{ fontSize: 36, marginBottom: 12 }}>??</div>
                 <p style={{ fontSize: 17, fontWeight: 700, marginBottom: 6, fontFamily: 'Syne, sans-serif' }}>
                   {dragging ? 'Drop it here!' : 'Drop your file here'}
                 </p>
@@ -203,7 +203,7 @@ export default function Home() {
               </>
             ) : (
               <div>
-                <div style={{ fontSize: 32, marginBottom: 10 }}>{fileType === 'video' ? '🎬' : '🎵'}</div>
+                <div style={{ fontSize: 32, marginBottom: 10 }}>{fileType === 'video' ? '??' : '??'}</div>
                 <div style={{
                   display: 'inline-block', padding: '3px 10px', borderRadius: 6, marginBottom: 10,
                   background: fileType === 'video' ? 'rgba(167,139,250,0.1)' : 'rgba(34,211,160,0.1)',
@@ -211,7 +211,7 @@ export default function Home() {
                   fontSize: 11, fontWeight: 700,
                   color: fileType === 'video' ? 'var(--accent2)' : '#22D3A0'
                 }}>
-                  {fileType === 'video' ? 'VIDEO' : 'AUDIO'} · {getExt(file.name)}
+                  {fileType === 'video' ? 'VIDEO' : 'AUDIO'} � {getExt(file.name)}
                 </div>
                 <p style={{ fontSize: 15, fontWeight: 600, marginBottom: 4, fontFamily: 'Syne, sans-serif' }}>
                   {file.name.length > 42 ? file.name.slice(0, 39) + '...' : file.name}
@@ -243,7 +243,7 @@ export default function Home() {
           </button>
 
           <p style={{ textAlign: 'center', marginTop: 12, fontSize: 13, color: 'var(--muted)' }}>
-            Free · No account needed · ~2-3 min processing
+            Free � No account needed � ~2-3 min processing
           </p>
         </div>
 
@@ -265,7 +265,7 @@ export default function Home() {
                 }}>{i + 1}</span>
                 {s}
               </div>
-              {i < 2 && <span style={{ color: 'var(--border)', fontSize: 16 }}>→</span>}
+              {i < 2 && <span style={{ color: 'var(--border)', fontSize: 16 }}>?</span>}
             </div>
           ))}
         </div>
@@ -348,7 +348,7 @@ export default function Home() {
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   fontSize: 24, margin: '0 auto 16px'
                 }}>
-                  {i === 0 ? '🧠' : i === 1 ? '🔓' : '🛡'}
+                  {i === 0 ? '??' : i === 1 ? '??' : '??'}
                 </div>
                 <h3 style={{ fontFamily: 'Syne, sans-serif', fontSize: 17, fontWeight: 700, marginBottom: 4 }}>{t.name}</h3>
                 <p style={{ fontSize: 12, color: 'var(--accent2)', marginBottom: 10, textTransform: 'uppercase', letterSpacing: 1 }}>{t.role}</p>
@@ -419,7 +419,7 @@ export default function Home() {
           </div>
           <div style={{ borderTop: '1px solid var(--border)', paddingTop: 24, display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
             <p style={{ color: 'var(--muted)', fontSize: 13 }}>2026 Vocalify. All rights reserved.</p>
-            <p style={{ color: 'var(--muted)', fontSize: 13 }}>Powered by Meta Demucs · Built with Next.js and FastAPI</p>
+            <p style={{ color: 'var(--muted)', fontSize: 13 }}>Powered by Meta Demucs � Built with Next.js and FastAPI</p>
           </div>
         </div>
       </footer>

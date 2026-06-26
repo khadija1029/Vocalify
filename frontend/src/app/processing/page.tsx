@@ -62,7 +62,7 @@ function ProcessingContent() {
     if (!jobId) { setError('No job ID found.'); return }
     const poll = setInterval(async () => {
       try {
-        const res = await fetch(`http://127.0.0.1:8000/job/${jobId}`)
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/job/${jobId}`)
         if (!res.ok) throw new Error('Job not found')
         const data = await res.json()
         setStatus(data.status)

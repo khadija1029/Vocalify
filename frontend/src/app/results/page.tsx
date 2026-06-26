@@ -26,7 +26,7 @@ function AudioPlayer({ jobId, stem, color }: { jobId: string; stem: string; colo
   const [progress, setProg] = useState(0)
   const [duration, setDur] = useState(0)
   const audioRef = useRef<HTMLAudioElement>(null)
-  const src = `http://127.0.0.1:8000/download/${jobId}/${stem}`
+  const src = `${process.env.NEXT_PUBLIC_API_URL}/download/${jobId}/${stem}`
 
   useEffect(() => {
     const a = audioRef.current
@@ -98,7 +98,7 @@ function AudioPlayer({ jobId, stem, color }: { jobId: string; stem: string; colo
 }
 
 function VideoPlayer({ jobId, stem, color }: { jobId: string; stem: string; color: string }) {
-  const src = `http://127.0.0.1:8000/download/${jobId}/${stem}`
+  const src = `${process.env.NEXT_PUBLIC_API_URL}/download/${jobId}/${stem}`
   return (
     <div style={{ marginTop: 16 }}>
       <video
@@ -135,7 +135,7 @@ function TrackCard({
           </div>
         </div>
         <a
-          href={`http://127.0.0.1:8000/download/${jobId}/${track.stem}`}
+          href={`${process.env.NEXT_PUBLIC_API_URL}/download/${jobId}/${track.stem}`}
           download={isVideo ? `${track.stem}_video.mp4` : `${track.stem}.wav`}
           style={{ textDecoration: 'none' }}
         >
@@ -229,7 +229,7 @@ function ResultsContent() {
 
   useEffect(() => {
     if (!jobId) { setError('No job ID.'); return }
-    fetch(`http://127.0.0.1:8000/job/${jobId}/result`)
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/job/${jobId}/result`)
       .then(r => { if (!r.ok) throw new Error(); return r.json() })
       .then(data => { setIsVideo(data.is_video || false); setVerified(true) })
       .catch(() => setError('Results not ready or job not found.'))
