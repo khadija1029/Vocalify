@@ -1,4 +1,4 @@
-'use client'
+ï»¿'use client'
 import { useState, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Navbar from '@/components/Navbar'
@@ -30,7 +30,7 @@ const features = [
 
 const team = [
   { name: 'Built on Demucs', role: 'Meta AI Research', desc: 'State-of-the-art music source separation model used by audio professionals worldwide.' },
-  { name: 'Open Source', role: 'Transparent Technology', desc: 'Powered by open-source AI — no black boxes, no hidden processing.' },
+  { name: 'Open Source', role: 'Transparent Technology', desc: 'Powered by open-source AI â€” no black boxes, no hidden processing.' },
   { name: 'No Account Needed', role: 'Privacy First', desc: 'Upload, process, download. No sign-up, no tracking, no data retention.' },
 ]
 
@@ -211,7 +211,7 @@ export default function Home() {
                   fontSize: 11, fontWeight: 700,
                   color: fileType === 'video' ? 'var(--accent2)' : '#22D3A0'
                 }}>
-                  {fileType === 'video' ? 'VIDEO' : 'AUDIO'} · {getExt(file.name)}
+                  {fileType === 'video' ? 'VIDEO' : 'AUDIO'} Â· {getExt(file.name)}
                 </div>
                 <p style={{ fontSize: 15, fontWeight: 600, marginBottom: 4, fontFamily: 'Syne, sans-serif' }}>
                   {file.name.length > 42 ? file.name.slice(0, 39) + '...' : file.name}
@@ -243,7 +243,7 @@ export default function Home() {
           </button>
 
           <p style={{ textAlign: 'center', marginTop: 12, fontSize: 13, color: 'var(--muted)' }}>
-            Free · No account needed · ~2-3 min processing
+            Free Â· No account needed Â· ~2-3 min processing
           </p>
         </div>
 
@@ -419,7 +419,7 @@ export default function Home() {
           </div>
           <div style={{ borderTop: '1px solid var(--border)', paddingTop: 24, display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
             <p style={{ color: 'var(--muted)', fontSize: 13 }}>2026 Vocalify. All rights reserved.</p>
-            <p style={{ color: 'var(--muted)', fontSize: 13 }}>Powered by Meta Demucs · Built with Next.js and FastAPI</p>
+            <p style={{ color: 'var(--muted)', fontSize: 13 }}>Powered by Meta Demucs Â· Built with Next.js and FastAPI</p>
           </div>
         </div>
       </footer>
