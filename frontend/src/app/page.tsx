@@ -145,11 +145,14 @@ export default function Home() {
             <div style={{ fontSize: 10, color: 'var(--muted)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: 1 }}>Original</div>
             <WaveformIcon color="#6B7A99" />
           </div>
-          <div style={{ color: 'var(--accent)', fontSize: 18 }}>to</div>
-          <div>
-            <div style={{ fontSize: 10, color: '#22D3A0', marginBottom: 4, textTransform: 'uppercase', letterSpacing: 1 }}>Vocals</div>
-            <WaveformIcon color="#22D3A0" animated />
-          </div>
+          <div style={{
+  width: 56, height: 56, borderRadius: 14, margin: '0 auto 16px',
+  background: 'rgba(108,99,255,0.1)', border: '1px solid rgba(108,99,255,0.2)',
+  display: 'flex', alignItems: 'center', justifyContent: 'center',
+  fontSize: 24, color: 'var(--accent2)'
+}}>
+  ♪
+</div>
           <div style={{ width: 1, height: 36, background: 'var(--border)' }} />
           <div>
             <div style={{ fontSize: 10, color: 'var(--accent2)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: 1 }}>Instrumental</div>
@@ -249,7 +252,7 @@ export default function Home() {
             opacity: (!file || uploading) ? 0.45 : 1,
             cursor: (!file || uploading) ? 'not-allowed' : 'pointer'
           }}>
-            {uploading ? 'Uploading...' : file ? `Extract from ${fileType === 'video' ? 'video' : 'audio'}` : 'Choose a file to get started'}
+            {uploading ? 'Processing...' : file ? `Extract from ${fileType === 'video' ? 'video' : 'audio'}` : 'Choose a file to get started'}
           </button>
 
           <p style={{ textAlign: 'center', marginTop: 12, fontSize: 13, color: 'var(--muted)' }}>
