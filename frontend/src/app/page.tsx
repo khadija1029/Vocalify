@@ -7,6 +7,7 @@ const ACCEPTED_AUDIO = ['audio/mpeg', 'audio/wav', 'audio/mp3']
 const ACCEPTED_VIDEO = ['video/mp4', 'video/quicktime', 'video/x-msvideo', 'video/webm']
 const ALL_ACCEPTED = [...ACCEPTED_AUDIO, ...ACCEPTED_VIDEO]
 const MAX_MB = 200
+const API = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'
 
 const WaveformIcon = ({ color = '#6C63FF', animated = false }: { color?: string; animated?: boolean }) => (
   <div style={{ display: 'flex', alignItems: 'center', gap: 3, height: 36 }}>
@@ -20,12 +21,12 @@ const WaveformIcon = ({ color = '#6C63FF', animated = false }: { color?: string;
 )
 
 const features = [
-  { icon: '??', title: 'Isolated Vocals', desc: 'Crystal-clear vocal extraction powered by Meta Demucs neural network.' },
-  { icon: '??', title: 'Clean Instrumental', desc: 'Full backing track with vocals completely removed, not just filtered.' },
-  { icon: '??', title: 'Video Support', desc: 'Upload MP4 videos and get back a video with vocals removed or isolated.' },
-  { icon: '?', title: 'Fast Processing', desc: 'Most tracks processed in under 3 minutes on CPU, faster on GPU.' },
-  { icon: '??', title: 'Multiple Formats', desc: 'Upload MP3, WAV, MP4, MOV, AVI. We handle conversion automatically.' },
-  { icon: '??', title: 'Private & Secure', desc: 'Your files are processed locally and deleted after download.' },
+  { icon: 'MIC', title: 'Isolated Vocals', desc: 'Crystal-clear vocal extraction powered by Meta Demucs neural network.' },
+  { icon: 'MIX', title: 'Clean Instrumental', desc: 'Full backing track with vocals completely removed, not just filtered.' },
+  { icon: 'VID', title: 'Video Support', desc: 'Upload MP4 videos and get back a video with vocals removed or isolated.' },
+  { icon: 'FAST', title: 'Fast Processing', desc: 'Most tracks processed in under 3 minutes on CPU, faster on GPU.' },
+  { icon: 'FMT', title: 'Multiple Formats', desc: 'Upload MP3, WAV, MP4, MOV, AVI. We handle conversion automatically.' },
+  { icon: 'SEC', title: 'Private & Secure', desc: 'Your files are processed locally and deleted after download.' },
 ]
 
 const team = [
@@ -82,7 +83,7 @@ export default function Home() {
     try {
       const formData = new FormData()
       formData.append('file', file)
-      const res = await fetch('${process.env.NEXT_PUBLIC_API_URL}/upload', { method: 'POST', body: formData })
+      const res = await fetch(`${API}/upload`, { method: 'POST', body: formData })
       if (!res.ok) { const err = await res.json(); throw new Error(err.detail || 'Upload failed') }
       const { job_id } = await res.json()
       router.push(`/processing?job_id=${job_id}`)
@@ -101,7 +102,6 @@ export default function Home() {
     <div style={{ minHeight: '100vh', position: 'relative' }}>
       <Navbar onUploadClick={() => scrollTo(uploadRef)} onAboutClick={() => scrollTo(aboutRef)} />
 
-      {/* Hero glow */}
       <div style={{
         position: 'fixed', top: '15%', left: '50%', transform: 'translateX(-50%)',
         width: 700, height: 700,
@@ -109,7 +109,6 @@ export default function Home() {
         pointerEvents: 'none', zIndex: 0
       }} />
 
-      {/* HERO + UPLOAD */}
       <section style={{
         minHeight: '100vh', display: 'flex', flexDirection: 'column',
         alignItems: 'center', justifyContent: 'center',
@@ -137,7 +136,6 @@ export default function Home() {
           Upload audio or video. Get clean isolated vocals and a full instrumental, separated by AI in minutes.
         </p>
 
-        {/* Waveform preview */}
         <div style={{
           display: 'flex', alignItems: 'center', gap: 20, marginBottom: 40,
           padding: '16px 28px', background: 'var(--surface)',
@@ -159,7 +157,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Upload box */}
         <div ref={uploadRef} style={{ width: '100%', maxWidth: 540 }}>
           <div
             onDrop={onDrop}
@@ -181,7 +178,13 @@ export default function Home() {
             />
             {!file ? (
               <>
-                <div style={{ fontSize: 36, marginBottom: 12 }}>??</div>
+                <div style={{
+                  width: 64, height: 64, borderRadius: 16, margin: '0 auto 16px',
+                  background: 'rgba(108,99,255,0.1)', border: '1px solid rgba(108,99,255,0.2)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center'
+                }}>
+                  <WaveformIcon color="#6C63FF" />
+                </div>
                 <p style={{ fontSize: 17, fontWeight: 700, marginBottom: 6, fontFamily: 'Syne, sans-serif' }}>
                   {dragging ? 'Drop it here!' : 'Drop your file here'}
                 </p>
@@ -203,7 +206,14 @@ export default function Home() {
               </>
             ) : (
               <div>
-                <div style={{ fontSize: 32, marginBottom: 10 }}>{fileType === 'video' ? '??' : '??'}</div>
+                <div style={{
+                  width: 56, height: 56, borderRadius: 14, margin: '0 auto 12px',
+                  background: fileType === 'video' ? 'rgba(167,139,250,0.1)' : 'rgba(34,211,160,0.1)',
+                  border: `1px solid ${fileType === 'video' ? 'rgba(167,139,250,0.3)' : 'rgba(34,211,160,0.3)'}`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 11, fontWeight: 800, letterSpacing: 1,
+                  color: fileType === 'video' ? 'var(--accent2)' : '#22D3A0'
+                }}>{fileType === 'video' ? 'VIDEO' : 'AUDIO'}</div>
                 <div style={{
                   display: 'inline-block', padding: '3px 10px', borderRadius: 6, marginBottom: 10,
                   background: fileType === 'video' ? 'rgba(167,139,250,0.1)' : 'rgba(34,211,160,0.1)',
@@ -211,7 +221,7 @@ export default function Home() {
                   fontSize: 11, fontWeight: 700,
                   color: fileType === 'video' ? 'var(--accent2)' : '#22D3A0'
                 }}>
-                  {fileType === 'video' ? 'VIDEO' : 'AUDIO'} · {getExt(file.name)}
+                  {getExt(file.name)}
                 </div>
                 <p style={{ fontSize: 15, fontWeight: 600, marginBottom: 4, fontFamily: 'Syne, sans-serif' }}>
                   {file.name.length > 42 ? file.name.slice(0, 39) + '...' : file.name}
@@ -239,7 +249,7 @@ export default function Home() {
             opacity: (!file || uploading) ? 0.45 : 1,
             cursor: (!file || uploading) ? 'not-allowed' : 'pointer'
           }}>
-            {uploading ? 'Processing...' : file ? `Extract from ${fileType === 'video' ? 'video' : 'audio'}` : 'Choose a file to get started'}
+            {uploading ? 'Uploading...' : file ? `Extract from ${fileType === 'video' ? 'video' : 'audio'}` : 'Choose a file to get started'}
           </button>
 
           <p style={{ textAlign: 'center', marginTop: 12, fontSize: 13, color: 'var(--muted)' }}>
@@ -247,7 +257,6 @@ export default function Home() {
           </p>
         </div>
 
-        {/* Steps row */}
         <div style={{ display: 'flex', gap: 8, marginTop: 44, flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center' }}>
           {['Upload audio or video', 'AI separates stems', 'Download results'].map((s, i) => (
             <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -265,18 +274,15 @@ export default function Home() {
                 }}>{i + 1}</span>
                 {s}
               </div>
-              {i < 2 && <span style={{ color: 'var(--border)', fontSize: 16 }}>?</span>}
+              {i < 2 && <span style={{ color: 'var(--border)', fontSize: 16 }}>-</span>}
             </div>
           ))}
         </div>
       </section>
 
-      {/* FEATURES */}
       <section style={{ padding: '100px 24px', borderTop: '1px solid var(--border)', position: 'relative', zIndex: 1 }}>
         <div style={{ maxWidth: 960, margin: '0 auto' }}>
-          <p style={{ textAlign: 'center', fontSize: 12, color: 'var(--accent2)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12 }}>
-            What you get
-          </p>
+          <p style={{ textAlign: 'center', fontSize: 12, color: 'var(--accent2)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12 }}>What you get</p>
           <h2 style={{ fontFamily: 'Syne, sans-serif', fontSize: 'clamp(28px, 4vw, 44px)', fontWeight: 800, textAlign: 'center', marginBottom: 16, letterSpacing: '-1px' }}>
             Professional-grade separation
           </h2>
@@ -288,7 +294,12 @@ export default function Home() {
               <div key={i} className="card" style={{ padding: 28, transition: 'transform 0.2s ease' }}
                 onMouseEnter={e => (e.currentTarget.style.transform = 'translateY(-4px)')}
                 onMouseLeave={e => (e.currentTarget.style.transform = 'translateY(0)')}>
-                <div style={{ fontSize: 28, marginBottom: 14 }}>{f.icon}</div>
+                <div style={{
+                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                  padding: '6px 12px', borderRadius: 8, marginBottom: 14,
+                  background: 'rgba(108,99,255,0.1)', border: '1px solid rgba(108,99,255,0.2)',
+                  fontSize: 11, fontWeight: 800, color: 'var(--accent2)', letterSpacing: 1
+                }}>{f.icon}</div>
                 <h3 style={{ fontFamily: 'Syne, sans-serif', fontSize: 17, fontWeight: 700, marginBottom: 8 }}>{f.title}</h3>
                 <p style={{ color: 'var(--muted)', fontSize: 14, lineHeight: 1.65 }}>{f.desc}</p>
               </div>
@@ -297,12 +308,9 @@ export default function Home() {
         </div>
       </section>
 
-      {/* HOW IT WORKS */}
       <section style={{ padding: '100px 24px', position: 'relative', zIndex: 1 }}>
         <div style={{ maxWidth: 800, margin: '0 auto' }}>
-          <p style={{ textAlign: 'center', fontSize: 12, color: 'var(--accent2)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12 }}>
-            How it works
-          </p>
+          <p style={{ textAlign: 'center', fontSize: 12, color: 'var(--accent2)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12 }}>How it works</p>
           <h2 style={{ fontFamily: 'Syne, sans-serif', fontSize: 'clamp(28px, 4vw, 44px)', fontWeight: 800, textAlign: 'center', marginBottom: 64, letterSpacing: '-1px' }}>
             Three steps. That is it.
           </h2>
@@ -313,10 +321,7 @@ export default function Home() {
               { step: '03', title: 'Download your stems', desc: 'Get isolated vocals and a clean instrumental. For video files, download the processed video with vocals removed.', color: '#22D3A0' },
             ].map((s, i) => (
               <div key={i} className="card" style={{ padding: '28px 32px', display: 'flex', gap: 24, alignItems: 'flex-start' }}>
-                <div style={{
-                  fontFamily: 'Syne, sans-serif', fontSize: 36, fontWeight: 800,
-                  color: s.color, opacity: 0.3, flexShrink: 0, lineHeight: 1
-                }}>{s.step}</div>
+                <div style={{ fontFamily: 'Syne, sans-serif', fontSize: 36, fontWeight: 800, color: s.color, opacity: 0.3, flexShrink: 0, lineHeight: 1 }}>{s.step}</div>
                 <div>
                   <h3 style={{ fontFamily: 'Syne, sans-serif', fontSize: 19, fontWeight: 700, marginBottom: 8 }}>{s.title}</h3>
                   <p style={{ color: 'var(--muted)', fontSize: 15, lineHeight: 1.65 }}>{s.desc}</p>
@@ -327,14 +332,11 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ABOUT */}
       <section ref={aboutRef} style={{ padding: '100px 24px', borderTop: '1px solid var(--border)', position: 'relative', zIndex: 1 }}>
         <div style={{ maxWidth: 960, margin: '0 auto' }}>
-          <p style={{ textAlign: 'center', fontSize: 12, color: 'var(--accent2)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12 }}>
-            About Vocalify
-          </p>
+          <p style={{ textAlign: 'center', fontSize: 12, color: 'var(--accent2)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12 }}>About Vocalify</p>
           <h2 style={{ fontFamily: 'Syne, sans-serif', fontSize: 'clamp(28px, 4vw, 44px)', fontWeight: 800, textAlign: 'center', marginBottom: 16, letterSpacing: '-1px' }}>
-            Built for musicians, creators<br />and audio engineers
+            Built for musicians, creators and audio engineers
           </h2>
           <p style={{ textAlign: 'center', color: 'var(--muted)', fontSize: 16, maxWidth: 560, margin: '0 auto 64px', lineHeight: 1.7 }}>
             Vocalify makes professional-grade audio separation accessible to everyone. Whether you are a producer, content creator, karaoke enthusiast, or audio engineer, we have you covered.
@@ -346,9 +348,10 @@ export default function Home() {
                   width: 56, height: 56, borderRadius: 14,
                   background: 'rgba(108,99,255,0.1)', border: '1px solid rgba(108,99,255,0.2)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 24, margin: '0 auto 16px'
+                  fontSize: 11, fontWeight: 800, color: 'var(--accent2)', letterSpacing: 1,
+                  margin: '0 auto 16px'
                 }}>
-                  {i === 0 ? '??' : i === 1 ? '??' : '??'}
+                  {i === 0 ? 'AI' : i === 1 ? 'OS' : 'PVT'}
                 </div>
                 <h3 style={{ fontFamily: 'Syne, sans-serif', fontSize: 17, fontWeight: 700, marginBottom: 4 }}>{t.name}</h3>
                 <p style={{ fontSize: 12, color: 'var(--accent2)', marginBottom: 10, textTransform: 'uppercase', letterSpacing: 1 }}>{t.role}</p>
@@ -356,12 +359,9 @@ export default function Home() {
               </div>
             ))}
           </div>
-
-          {/* Stats */}
           <div style={{
             display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
-            gap: 1, background: 'var(--border)', borderRadius: 16, overflow: 'hidden',
-            border: '1px solid var(--border)'
+            gap: 1, background: 'var(--border)', borderRadius: 16, overflow: 'hidden', border: '1px solid var(--border)'
           }}>
             {[
               { num: '4', label: 'Stem separation' },
@@ -370,8 +370,7 @@ export default function Home() {
               { num: '0', label: 'Accounts needed' },
             ].map((s, i) => (
               <div key={i} style={{ padding: '32px 24px', textAlign: 'center', background: 'var(--surface)' }}>
-                <div style={{ fontFamily: 'Syne, sans-serif', fontSize: 36, fontWeight: 800, marginBottom: 6 }}
-                  className="gradient-text">{s.num}</div>
+                <div style={{ fontFamily: 'Syne, sans-serif', fontSize: 36, fontWeight: 800, marginBottom: 6 }} className="gradient-text">{s.num}</div>
                 <div style={{ color: 'var(--muted)', fontSize: 13 }}>{s.label}</div>
               </div>
             ))}
@@ -379,17 +378,30 @@ export default function Home() {
         </div>
       </section>
 
+      <section style={{ padding: '80px 24px', position: 'relative', zIndex: 1 }}>
+        <div style={{
+          maxWidth: 700, margin: '0 auto', textAlign: 'center', padding: '72px 40px',
+          background: 'linear-gradient(135deg, rgba(108,99,255,0.12), rgba(34,211,160,0.06))',
+          border: '1px solid rgba(108,99,255,0.2)', borderRadius: 28
+        }}>
+          <h2 style={{ fontFamily: 'Syne, sans-serif', fontSize: 'clamp(28px, 4vw, 44px)', fontWeight: 800, letterSpacing: '-1px', marginBottom: 14 }}>
+            Ready to extract?
+          </h2>
+          <p style={{ color: 'var(--muted)', marginBottom: 36, fontSize: 16, lineHeight: 1.6 }}>
+            Drop your track or video and get professional stems back in minutes. No account. No cost.
+          </p>
+          <button className="btn-primary glow" onClick={() => scrollTo(uploadRef)} style={{ padding: '16px 44px', borderRadius: 12, fontSize: 16 }}>
+            Start extracting now
+          </button>
+        </div>
+      </section>
 
-      {/* FOOTER */}
       <footer style={{ borderTop: '1px solid var(--border)', position: 'relative', zIndex: 1 }}>
         <div style={{ maxWidth: 960, margin: '0 auto', padding: '48px 24px 32px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 32, marginBottom: 40 }}>
             <div style={{ maxWidth: 280 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-                <div style={{
-                  width: 32, height: 32, background: 'linear-gradient(135deg, #6C63FF, #22D3A0)',
-                  borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2
-                }}>
+                <div style={{ width: 32, height: 32, background: 'linear-gradient(135deg, #6C63FF, #22D3A0)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
                   {[3,5,4,6,3].map((h, i) => (
                     <div key={i} style={{ width: 3, height: h * 3, background: 'white', borderRadius: 2 }} />
                   ))}
@@ -404,15 +416,13 @@ export default function Home() {
               <div>
                 <p style={{ fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 13, marginBottom: 14, color: 'var(--text)' }}>Product</p>
                 {['Upload & Extract', 'How it works', 'Features'].map(l => (
-                  <p key={l} style={{ color: 'var(--muted)', fontSize: 14, marginBottom: 10, cursor: 'pointer' }}
-                    onClick={() => scrollTo(uploadRef)}>{l}</p>
+                  <p key={l} style={{ color: 'var(--muted)', fontSize: 14, marginBottom: 10, cursor: 'pointer' }} onClick={() => scrollTo(uploadRef)}>{l}</p>
                 ))}
               </div>
               <div>
                 <p style={{ fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 13, marginBottom: 14, color: 'var(--text)' }}>Company</p>
                 {['About Us', 'Technology', 'Privacy'].map(l => (
-                  <p key={l} style={{ color: 'var(--muted)', fontSize: 14, marginBottom: 10, cursor: 'pointer' }}
-                    onClick={() => scrollTo(aboutRef)}>{l}</p>
+                  <p key={l} style={{ color: 'var(--muted)', fontSize: 14, marginBottom: 10, cursor: 'pointer' }} onClick={() => scrollTo(aboutRef)}>{l}</p>
                 ))}
               </div>
             </div>
