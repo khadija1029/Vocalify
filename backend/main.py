@@ -2,7 +2,8 @@ import os
 import uuid
 import subprocess
 import shutil
-from fastapi import FastAPI, UploadFile, File, HTTPException
+import threading
+from fastapi import FastAPI, UploadFile, File, HTTPException, Request
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -15,7 +16,6 @@ app.add_middleware(
     allow_headers=["*"],
     allow_credentials=True,
 )
-from fastapi import Request
 
 @app.middleware("http")
 async def add_ngrok_header(request: Request, call_next):
@@ -29,6 +29,8 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 os.makedirs(RESULTS_DIR, exist_ok=True)
 
 jobs = {}
+# Track how many stems have been downloaded per job
+download_counts = {}
 
 ALLOWED_AUDIO = ["audio/mpeg", "audio/wav", "audio/mp3"]
 ALLOWED_VIDEO = ["video/mp4", "video/quicktime", "video/x-msvideo", "video/webm"]
@@ -37,16 +39,28 @@ ALLOWED_ALL = ALLOWED_AUDIO + ALLOWED_VIDEO
 def cleanup_job(job_id: str):
     """Delete all files related to a job"""
     try:
-        # Delete upload files
         for f in os.listdir(UPLOAD_DIR):
             if f.startswith(job_id):
                 os.remove(os.path.join(UPLOAD_DIR, f))
-        # Delete results folder
         result_path = os.path.join(RESULTS_DIR, job_id)
         if os.path.exists(result_path):
             shutil.rmtree(result_path)
+        if job_id in jobs:
+            del jobs[job_id]
+        if job_id in download_counts:
+            del download_counts[job_id]
+        print(f"Cleaned up job {job_id[:8]}")
     except Exception as e:
         print(f"Cleanup error: {e}")
+
+def delayed_cleanup(job_id: str, delay_seconds: int = 300):
+    """Clean up job files after a delay (default 5 minutes)"""
+    def run():
+        import time
+        time.sleep(delay_seconds)
+        cleanup_job(job_id)
+    t = threading.Thread(target=run, daemon=True)
+    t.start()
 
 @app.get("/")
 def root():
@@ -71,6 +85,7 @@ async def upload_file(file: UploadFile = File(...)):
         f.write(await file.read())
 
     jobs[job_id] = {"status": "processing", "progress": 20, "is_video": is_video}
+    download_counts[job_id] = 0
 
     demucs_path = r"D:\vocalify\ai-engine\venv\Scripts\demucs.exe"
     output_dir = f"{RESULTS_DIR}/{job_id}"
@@ -84,7 +99,7 @@ async def upload_file(file: UploadFile = File(...)):
         if extract.returncode != 0:
             jobs[job_id]["status"] = "failed"
             cleanup_job(job_id)
-            raise HTTPException(500, f"Could not extract audio from video: {extract.stderr}")
+            raise HTTPException(500, f"Could not extract audio from video.")
 
     jobs[job_id]["progress"] = 40
 
@@ -95,7 +110,7 @@ async def upload_file(file: UploadFile = File(...)):
     if result.returncode != 0:
         jobs[job_id]["status"] = "failed"
         cleanup_job(job_id)
-        raise HTTPException(500, f"Demucs failed: {result.stderr}")
+        raise HTTPException(500, f"Demucs failed.")
 
     jobs[job_id]["progress"] = 80
 
@@ -121,6 +136,10 @@ async def upload_file(file: UploadFile = File(...)):
 
     jobs[job_id]["status"] = "done"
     jobs[job_id]["progress"] = 100
+
+    # Auto-delete files after 5 minutes
+    delayed_cleanup(job_id, delay_seconds=300)
+
     return {"job_id": job_id}
 
 
@@ -150,10 +169,8 @@ def download_file(job_id: str, stem: str):
     if job_id not in jobs:
         raise HTTPException(404, "Job not found")
 
-    is_video = jobs[job_id].get("is_video", False)
     base = f"{RESULTS_DIR}/{job_id}"
 
-    # Determine file path based on stem name
     if stem == "vocals_video":
         file_path = f"{base}/vocals_video.mp4"
         media_type = "video/mp4"
@@ -163,7 +180,6 @@ def download_file(job_id: str, stem: str):
         media_type = "video/mp4"
         filename = "instrumental_video.mp4"
     elif stem in ["vocals", "no_vocals"]:
-        # Always serve WAV audio stems
         htdemucs = f"{base}/htdemucs"
         folders = os.listdir(htdemucs)
         track_folder = f"{htdemucs}/{folders[0]}"
@@ -176,28 +192,12 @@ def download_file(job_id: str, stem: str):
     if not os.path.exists(file_path):
         raise HTTPException(404, "Output file not found")
 
-    # Stream file then schedule cleanup after sending
-    response = FileResponse(
-        file_path,
-        media_type=media_type,
-        filename=filename
-    )
-    return response
-
-
-@app.delete("/job/{job_id}")
-def delete_job(job_id: str):
-    """Manually delete a job and its files"""
-    if job_id not in jobs:
-        raise HTTPException(404, "Job not found")
-    cleanup_job(job_id)
-    del jobs[job_id]
-    return {"message": "Job deleted"}
+    return FileResponse(file_path, media_type=media_type, filename=filename)
 
 
 @app.on_event("startup")
 async def startup_cleanup():
-    """Clean up any leftover files from previous sessions on startup"""
+    """Clean up any leftover files from previous sessions"""
     try:
         for folder in [UPLOAD_DIR, RESULTS_DIR]:
             if os.path.exists(folder):
