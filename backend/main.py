@@ -15,6 +15,13 @@ app.add_middleware(
     allow_headers=["*"],
     allow_credentials=True,
 )
+from fastapi import Request
+
+@app.middleware("http")
+async def add_ngrok_header(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["ngrok-skip-browser-warning"] = "true"
+    return response
 
 UPLOAD_DIR = "uploads"
 RESULTS_DIR = "results"
