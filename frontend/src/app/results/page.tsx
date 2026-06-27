@@ -1,22 +1,44 @@
 'use client'
+
 import { useEffect, useState, useRef, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Navbar from '@/components/Navbar'
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'
 const HEADERS = { 'ngrok-skip-browser-warning': 'true' }
+
 type OutputFormat = 'audio' | 'video' | 'both'
 
 function AudioPlayer({ jobId, stem, color }: { jobId: string, stem: string, color: string }) {
   const [playing, setPlaying] = useState(false)
   const [progress, setProg] = useState(0)
   const [duration, setDur] = useState(0)
+  const [blobUrl, setBlobUrl] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
   const audioRef = useRef<HTMLAudioElement>(null)
-  const src = `${API}/download/${jobId}/${stem}`
+
+  // Fetch audio as blob to bypass ngrok header requirement
+  useEffect(() => {
+    const fetchAudio = async () => {
+      try {
+        const res = await fetch(`${API}/download/${jobId}/${stem}`, { headers: HEADERS })
+        const blob = await res.blob()
+        const url = URL.createObjectURL(blob)
+        setBlobUrl(url)
+        setLoading(false)
+      } catch {
+        setLoading(false)
+      }
+    }
+    fetchAudio()
+    return () => {
+      if (blobUrl) URL.revokeObjectURL(blobUrl)
+    }
+  }, [jobId, stem])
 
   useEffect(() => {
     const a = audioRef.current
-    if (!a) return
+    if (!a || !blobUrl) return
     const onTime = () => setProg(a.currentTime / (a.duration || 1))
     const onLoad = () => setDur(a.duration)
     const onEnd = () => { setPlaying(false); setProg(0) }
@@ -28,7 +50,7 @@ function AudioPlayer({ jobId, stem, color }: { jobId: string, stem: string, colo
       a.removeEventListener('loadedmetadata', onLoad)
       a.removeEventListener('ended', onEnd)
     }
-  }, [])
+  }, [blobUrl])
 
   const toggle = () => {
     const a = audioRef.current
@@ -46,23 +68,39 @@ function AudioPlayer({ jobId, stem, color }: { jobId: string, stem: string, colo
 
   const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`
 
+  const handleDownload = async () => {
+    try {
+      const res = await fetch(`${API}/download/${jobId}/${stem}`, { headers: HEADERS })
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `${stem}.wav`
+      a.click()
+      URL.revokeObjectURL(url)
+    } catch {
+      alert('Download failed. Make sure backend is running.')
+    }
+  }
+
   return (
     <div style={{ marginTop: 14 }}>
-      <audio ref={audioRef} src={src} preload="metadata" />
+      {blobUrl && <audio ref={audioRef} src={blobUrl} preload="auto" />}
+      {loading && (
+        <p style={{ color: 'var(--muted)', fontSize: 13, marginBottom: 10 }}>Loading audio...</p>
+      )}
       <div style={{ display: 'flex', alignItems: 'center', gap: 2, height: 24, marginBottom: 10 }}>
-        {Array.from({ length: 40 }).map((_, i) => (
-          <div key={i} style={{
+        {Array.from({ length: 40 }).map((_, i) => (          <div key={i} style={{
             flex: 1, height: 6 + Math.abs(Math.sin(i * 0.8) * 14),
             background: i / 40 < progress ? color : 'var(--border)',
             borderRadius: 2, transition: 'background 0.1s'
-          }} />
-        ))}
-      </div>
+          }} />        ))}      </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <button onClick={toggle} style={{
+        <button onClick={toggle} disabled={loading || !blobUrl} style={{
           width: 36, height: 36, borderRadius: '50%', border: 'none',
-          background: color, color: 'white', fontSize: 13,
-          cursor: 'pointer', flexShrink: 0, fontWeight: 700
+          background: loading ? 'var(--border)' : color,
+          color: 'white', fontSize: 13, cursor: loading ? 'not-allowed' : 'pointer',
+          flexShrink: 0, fontWeight: 700
         }}>{playing ? 'II' : '>'}</button>
         <div onClick={seek} style={{
           flex: 1, height: 4, background: 'var(--border)', borderRadius: 2,
@@ -74,20 +112,72 @@ function AudioPlayer({ jobId, stem, color }: { jobId: string, stem: string, colo
           {fmt(duration * progress)} / {fmt(duration)}
         </span>
       </div>
+      {/* Download button uses blob fetch */}
+      <button onClick={handleDownload} style={{
+        marginTop: 10, width: '100%', padding: '8px', borderRadius: 8, fontSize: 13,
+        background: `${color}15`, border: `1px solid ${color}35`,
+        color: color, cursor: 'pointer', fontWeight: 600
+      }}>
+        Download WAV
+      </button>
     </div>
-  )
-}
+  )}
 
-function VideoPlayer({ src, color }: { src: string, color: string }) {
+function VideoPlayer({ jobId, stem, color, filename }: { jobId: string, stem: string, color: string, filename: string }) {
+  const [blobUrl, setBlobUrl] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchVideo = async () => {
+      try {
+        const res = await fetch(`${API}/download/${jobId}/${stem}`, { headers: HEADERS })
+        const blob = await res.blob()
+        const url = URL.createObjectURL(blob)
+        setBlobUrl(url)
+        setLoading(false)
+      } catch {
+        setLoading(false)
+      }
+    }
+    fetchVideo()
+    return () => {
+      if (blobUrl) URL.revokeObjectURL(blobUrl)
+    }
+  }, [jobId, stem])
+
+  const handleDownload = async () => {
+    try {
+      const res = await fetch(`${API}/download/${jobId}/${stem}`, { headers: HEADERS })
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = filename
+      a.click()
+      URL.revokeObjectURL(url)
+    } catch {
+      alert('Download failed.')
+    }
+  }
+
   return (
     <div style={{ marginTop: 14 }}>
-      <video src={src} controls style={{
-        width: '100%', borderRadius: 10,
-        border: `1px solid ${color}30`, background: '#000', maxHeight: 220
-      }} />
+      {loading && <p style={{ color: 'var(--muted)', fontSize: 13, marginBottom: 10 }}>Loading video...</p>}
+      {blobUrl && (
+        <video src={blobUrl} controls style={{
+          width: '100%', borderRadius: 10,
+          border: `1px solid ${color}30`, background: '#000', maxHeight: 220
+        }} />
+      )}
+      <button onClick={handleDownload} style={{
+        marginTop: 10, width: '100%', padding: '8px', borderRadius: 8, fontSize: 13,
+        background: `${color}15`, border: `1px solid ${color}35`,
+        color: color, cursor: 'pointer', fontWeight: 600
+      }}>
+        Download MP4
+      </button>
     </div>
-  )
-}
+  )}
 
 function ResultsContent() {
   const searchParams = useSearchParams()
@@ -151,7 +241,6 @@ function ResultsContent() {
       }} />
 
       <div style={{ maxWidth: 640, margin: '0 auto', padding: '110px 24px 80px', position: 'relative', zIndex: 1 }}>
-
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
           <div style={{
             width: 68, height: 68, borderRadius: '50%',
@@ -163,7 +252,7 @@ function ResultsContent() {
             Processing complete
           </h1>
           <p style={{ color: 'var(--muted)', fontSize: 15 }}>
-            {isVideo ? 'Choose your output format below.' : 'Download your audio stems.'}
+            {isVideo ? 'Choose your output format below.' : 'Preview and download your stems.'}
           </p>
         </div>
 
@@ -202,26 +291,17 @@ function ResultsContent() {
             )}
             {audioStems.map(track => (
               <div key={track.stem} className="card" style={{ padding: 24, marginBottom: 14 }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <div style={{
-                      width: 42, height: 42, borderRadius: 11,
-                      background: `${track.color}15`, border: `1px solid ${track.color}35`,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: 10, fontWeight: 800, color: track.color
-                    }}>WAV</div>
-                    <div>
-                      <h3 style={{ fontFamily: 'Syne, sans-serif', fontSize: 16, fontWeight: 700 }}>{track.label}</h3>
-                      <p style={{ color: 'var(--muted)', fontSize: 12 }}>{track.desc}</p>
-                    </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <div style={{
+                    width: 42, height: 42, borderRadius: 11,
+                    background: `${track.color}15`, border: `1px solid ${track.color}35`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 10, fontWeight: 800, color: track.color, flexShrink: 0
+                  }}>WAV</div>
+                  <div>
+                    <h3 style={{ fontFamily: 'Syne, sans-serif', fontSize: 16, fontWeight: 700 }}>{track.label}</h3>
+                    <p style={{ color: 'var(--muted)', fontSize: 12 }}>{track.desc}</p>
                   </div>
-                  <a href={`${API}/download/${jobId}/${track.stem}`} download={track.filename} style={{ textDecoration: 'none' }}>
-                    <button style={{
-                      padding: '7px 14px', borderRadius: 8, fontSize: 12,
-                      background: `${track.color}15`, border: `1px solid ${track.color}35`,
-                      color: track.color, cursor: 'pointer', fontWeight: 600
-                    }}>Download WAV</button>
-                  </a>
                 </div>
                 <AudioPlayer jobId={jobId!} stem={track.stem} color={track.color} />
               </div>
@@ -234,35 +314,23 @@ function ResultsContent() {
             <p style={{ fontSize: 12, color: 'var(--accent2)', textTransform: 'uppercase', letterSpacing: 1, fontWeight: 600, marginBottom: 14 }}>
               Video stems (MP4)
             </p>
-            {videoStems.map(track => {
-              const videoSrc = `${API}/download/${jobId}/${track.stem}`
-              return (
-                <div key={track.stem} className="card" style={{ padding: 24, marginBottom: 14 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                      <div style={{
-                        width: 42, height: 42, borderRadius: 11,
-                        background: `${track.color}15`, border: `1px solid ${track.color}35`,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: 10, fontWeight: 800, color: track.color
-                      }}>MP4</div>
-                      <div>
-                        <h3 style={{ fontFamily: 'Syne, sans-serif', fontSize: 16, fontWeight: 700 }}>{track.label}</h3>
-                        <p style={{ color: 'var(--muted)', fontSize: 12 }}>{track.desc}</p>
-                      </div>
-                    </div>
-                    <a href={videoSrc} download={track.filename} style={{ textDecoration: 'none' }}>
-                      <button style={{
-                        padding: '7px 14px', borderRadius: 8, fontSize: 12,
-                        background: `${track.color}15`, border: `1px solid ${track.color}35`,
-                        color: track.color, cursor: 'pointer', fontWeight: 600
-                      }}>Download MP4</button>
-                    </a>
+            {videoStems.map(track => (
+              <div key={track.stem} className="card" style={{ padding: 24, marginBottom: 14 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <div style={{
+                    width: 42, height: 42, borderRadius: 11,
+                    background: `${track.color}15`, border: `1px solid ${track.color}35`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 10, fontWeight: 800, color: track.color, flexShrink: 0
+                  }}>MP4</div>
+                  <div>
+                    <h3 style={{ fontFamily: 'Syne, sans-serif', fontSize: 16, fontWeight: 700 }}>{track.label}</h3>
+                    <p style={{ color: 'var(--muted)', fontSize: 12 }}>{track.desc}</p>
                   </div>
-                  <VideoPlayer src={videoSrc} color={track.color} />
                 </div>
-              )
-            })}
+                <VideoPlayer jobId={jobId!} stem={track.stem} color={track.color} filename={track.filename} />
+              </div>
+            ))}
           </div>
         )}
 
@@ -278,8 +346,7 @@ function ResultsContent() {
         </div>
       </div>
     </div>
-  )
-}
+  )}
 
 export default function ResultsPage() {
   return (
@@ -290,5 +357,4 @@ export default function ResultsPage() {
     }>
       <ResultsContent />
     </Suspense>
-  )
-}
+  )}
