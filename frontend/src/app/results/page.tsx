@@ -4,6 +4,7 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import Navbar from '@/components/Navbar'
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'
+const HEADERS = { 'ngrok-skip-browser-warning': 'true' }
 type OutputFormat = 'audio' | 'video' | 'both'
 
 function AudioPlayer({ jobId, stem, color }: { jobId: string, stem: string, color: string }) {
@@ -11,8 +12,6 @@ function AudioPlayer({ jobId, stem, color }: { jobId: string, stem: string, colo
   const [progress, setProg] = useState(0)
   const [duration, setDur] = useState(0)
   const audioRef = useRef<HTMLAudioElement>(null)
-
-  // Audio stems are always vocals.wav or no_vocals.wav
   const src = `${API}/download/${jobId}/${stem}`
 
   useEffect(() => {
@@ -82,11 +81,10 @@ function AudioPlayer({ jobId, stem, color }: { jobId: string, stem: string, colo
 function VideoPlayer({ src, color }: { src: string, color: string }) {
   return (
     <div style={{ marginTop: 14 }}>
-      <video
-        src={src}
-        controls
-        style={{ width: '100%', borderRadius: 10, border: `1px solid ${color}30`, background: '#000', maxHeight: 220 }}
-      />
+      <video src={src} controls style={{
+        width: '100%', borderRadius: 10,
+        border: `1px solid ${color}30`, background: '#000', maxHeight: 220
+      }} />
     </div>
   )
 }
@@ -102,7 +100,7 @@ function ResultsContent() {
 
   useEffect(() => {
     if (!jobId) { setError('No job ID.'); return }
-    fetch(`${API}/job/${jobId}/result`)
+    fetch(`${API}/job/${jobId}/result`, { headers: HEADERS })
       .then(r => { if (!r.ok) throw new Error(); return r.json() })
       .then(data => {
         const video = data.is_video || false
@@ -129,13 +127,11 @@ function ResultsContent() {
     </div>
   )
 
-  // Audio stems — always vocals.wav and no_vocals.wav
   const audioStems = [
     { label: 'Vocals', desc: 'Isolated vocal track', color: '#22D3A0', stem: 'vocals', filename: 'vocals.wav' },
     { label: 'Instrumental', desc: 'Backing track, no vocals', color: '#A78BFA', stem: 'no_vocals', filename: 'instrumental.wav' },
   ]
 
-  // Video stems — vocals_video and no_vocals_video
   const videoStems = [
     { label: 'Vocals Video', desc: 'Video with only vocals audio', color: '#22D3A0', stem: 'vocals_video', filename: 'vocals_video.mp4' },
     { label: 'Instrumental Video', desc: 'Video with vocals removed', color: '#A78BFA', stem: 'no_vocals_video', filename: 'instrumental_video.mp4' },
@@ -147,7 +143,6 @@ function ResultsContent() {
   return (
     <div style={{ minHeight: '100vh', position: 'relative' }}>
       <Navbar />
-
       <div style={{
         position: 'fixed', top: '20%', left: '50%', transform: 'translateX(-50%)',
         width: 500, height: 500,
@@ -157,7 +152,6 @@ function ResultsContent() {
 
       <div style={{ maxWidth: 640, margin: '0 auto', padding: '110px 24px 80px', position: 'relative', zIndex: 1 }}>
 
-        {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
           <div style={{
             width: 68, height: 68, borderRadius: '50%',
@@ -169,11 +163,10 @@ function ResultsContent() {
             Processing complete
           </h1>
           <p style={{ color: 'var(--muted)', fontSize: 15 }}>
-            Your stems are ready. {isVideo ? 'Choose your output format below.' : 'Download your audio stems.'}
+            {isVideo ? 'Choose your output format below.' : 'Download your audio stems.'}
           </p>
         </div>
 
-        {/* Format selector — only for video uploads */}
         {isVideo && (
           <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 16, padding: 20, marginBottom: 28 }}>
             <p style={{ fontSize: 12, color: 'var(--muted)', marginBottom: 14, textTransform: 'uppercase', letterSpacing: 1, fontWeight: 600 }}>
@@ -200,7 +193,6 @@ function ResultsContent() {
           </div>
         )}
 
-        {/* AUDIO SECTION */}
         {showAudio && (
           <div style={{ marginBottom: 28 }}>
             {isVideo && (
@@ -216,26 +208,19 @@ function ResultsContent() {
                       width: 42, height: 42, borderRadius: 11,
                       background: `${track.color}15`, border: `1px solid ${track.color}35`,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: 10, fontWeight: 800, color: track.color, letterSpacing: 0.5
+                      fontSize: 10, fontWeight: 800, color: track.color
                     }}>WAV</div>
                     <div>
                       <h3 style={{ fontFamily: 'Syne, sans-serif', fontSize: 16, fontWeight: 700 }}>{track.label}</h3>
                       <p style={{ color: 'var(--muted)', fontSize: 12 }}>{track.desc}</p>
                     </div>
                   </div>
-                  {/* Download audio WAV */}
-                  <a
-                    href={`${API}/download/${jobId}/${track.stem}`}
-                    download={track.filename}
-                    style={{ textDecoration: 'none' }}
-                  >
+                  <a href={`${API}/download/${jobId}/${track.stem}`} download={track.filename} style={{ textDecoration: 'none' }}>
                     <button style={{
                       padding: '7px 14px', borderRadius: 8, fontSize: 12,
                       background: `${track.color}15`, border: `1px solid ${track.color}35`,
                       color: track.color, cursor: 'pointer', fontWeight: 600
-                    }}>
-                      Download WAV
-                    </button>
+                    }}>Download WAV</button>
                   </a>
                 </div>
                 <AudioPlayer jobId={jobId!} stem={track.stem} color={track.color} />
@@ -244,7 +229,6 @@ function ResultsContent() {
           </div>
         )}
 
-        {/* VIDEO SECTION */}
         {showVideo && (
           <div style={{ marginBottom: 28 }}>
             <p style={{ fontSize: 12, color: 'var(--accent2)', textTransform: 'uppercase', letterSpacing: 1, fontWeight: 600, marginBottom: 14 }}>
@@ -260,26 +244,19 @@ function ResultsContent() {
                         width: 42, height: 42, borderRadius: 11,
                         background: `${track.color}15`, border: `1px solid ${track.color}35`,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: 10, fontWeight: 800, color: track.color, letterSpacing: 0.5
+                        fontSize: 10, fontWeight: 800, color: track.color
                       }}>MP4</div>
                       <div>
                         <h3 style={{ fontFamily: 'Syne, sans-serif', fontSize: 16, fontWeight: 700 }}>{track.label}</h3>
                         <p style={{ color: 'var(--muted)', fontSize: 12 }}>{track.desc}</p>
                       </div>
                     </div>
-                    {/* Download video MP4 */}
-                    <a
-                      href={videoSrc}
-                      download={track.filename}
-                      style={{ textDecoration: 'none' }}
-                    >
+                    <a href={videoSrc} download={track.filename} style={{ textDecoration: 'none' }}>
                       <button style={{
                         padding: '7px 14px', borderRadius: 8, fontSize: 12,
                         background: `${track.color}15`, border: `1px solid ${track.color}35`,
                         color: track.color, cursor: 'pointer', fontWeight: 600
-                      }}>
-                        Download MP4
-                      </button>
+                      }}>Download MP4</button>
                     </a>
                   </div>
                   <VideoPlayer src={videoSrc} color={track.color} />
@@ -289,19 +266,13 @@ function ResultsContent() {
           </div>
         )}
 
-        {/* Job ID */}
-        <div style={{
-          padding: '12px 18px', borderRadius: 10, marginBottom: 28,
-          background: 'var(--surface)', border: '1px solid var(--border)',
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center'
-        }}>
+        <div style={{ padding: '12px 18px', borderRadius: 10, marginBottom: 28, background: 'var(--surface)', border: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span style={{ color: 'var(--muted)', fontSize: 12 }}>Job ID</span>
           <code style={{ fontSize: 11, color: 'var(--accent2)', fontFamily: 'monospace' }}>{jobId}</code>
         </div>
 
         <div style={{ textAlign: 'center' }}>
-          <button className="btn-primary" onClick={() => router.push('/')}
-            style={{ padding: '14px 36px', borderRadius: 12, fontSize: 15 }}>
+          <button className="btn-primary" onClick={() => router.push('/')} style={{ padding: '14px 36px', borderRadius: 12, fontSize: 15 }}>
             Process another track
           </button>
         </div>

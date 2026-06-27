@@ -4,12 +4,13 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import Navbar from '@/components/Navbar'
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'
+const HEADERS = { 'ngrok-skip-browser-warning': 'true' }
 
 const stages = [
-  { label: 'Queued',           icon: 'Q', pct: 10 },
-  { label: 'Analysing audio',  icon: 'A', pct: 40 },
-  { label: 'Separating stems', icon: 'S', pct: 70 },
-  { label: 'Finalising output',icon: 'F', pct: 95 },
+  { label: 'Queued',            icon: 'Q', pct: 10 },
+  { label: 'Analysing audio',   icon: 'A', pct: 40 },
+  { label: 'Separating stems',  icon: 'S', pct: 70 },
+  { label: 'Finalising output', icon: 'F', pct: 95 },
 ]
 
 function WaveAnim() {
@@ -59,7 +60,7 @@ function ProcessingContent() {
     if (!jobId) { setError('No job ID found.'); return }
     const poll = setInterval(async () => {
       try {
-        const res = await fetch(`${API}/job/${jobId}`)
+        const res = await fetch(`${API}/job/${jobId}`, { headers: HEADERS })
         if (!res.ok) throw new Error('Job not found')
         const data = await res.json()
         if (data.status === 'done') {
@@ -138,7 +139,7 @@ function ProcessingContent() {
                 }}>
                   <div style={{
                     width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700,
                     background: done ? 'rgba(34,211,160,0.15)' : active ? 'rgba(108,99,255,0.15)' : 'var(--surface2)',
                     border: done ? '1px solid rgba(34,211,160,0.4)' : active ? '1px solid rgba(108,99,255,0.4)' : '1px solid var(--border)',
                     color: done ? '#22D3A0' : active ? 'var(--accent2)' : 'var(--muted)'

@@ -77,22 +77,26 @@ export default function Home() {
   const getExt = (name: string) => name.split('.').pop()?.toUpperCase() || 'FILE'
 
   const handleUpload = async () => {
-    if (!file) return
-    setUploading(true)
-    setError('')
-    try {
-      const formData = new FormData()
-      formData.append('file', file)
-      const res = await fetch(`${API}/upload`, { method: 'POST', body: formData })
-      if (!res.ok) { const err = await res.json(); throw new Error(err.detail || 'Upload failed') }
-      const { job_id } = await res.json()
-      router.push(`/processing?job_id=${job_id}`)
-    } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : 'Something went wrong. Make sure the backend is running.'
-      setError(msg)
-      setUploading(false)
-    }
+  if (!file) return
+  setUploading(true)
+  setError('')
+  try {
+    const formData = new FormData()
+    formData.append('file', file)
+    const res = await fetch(`${API}/upload`, {
+      method: 'POST',
+      body: formData,
+      headers: { 'ngrok-skip-browser-warning': 'true' }
+    })
+    if (!res.ok) { const err = await res.json(); throw new Error(err.detail || 'Upload failed') }
+    const { job_id } = await res.json()
+    router.push(`/processing?job_id=${job_id}`)
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : 'Something went wrong.'
+    setError(msg)
+    setUploading(false)
   }
+}
 
   const scrollTo = (ref: React.RefObject<HTMLDivElement | null>) => {
     ref.current?.scrollIntoView({ behavior: 'smooth' })
