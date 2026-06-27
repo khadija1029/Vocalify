@@ -6,21 +6,13 @@ import Navbar from '@/components/Navbar'
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'
 type OutputFormat = 'audio' | 'video' | 'both'
 
-interface Track {
-  label: string
-  desc: string
-  color: string
-  icon: string
-  stem: string
-  type: 'audio' | 'video'
-  filename: string
-}
-
 function AudioPlayer({ jobId, stem, color }: { jobId: string, stem: string, color: string }) {
   const [playing, setPlaying] = useState(false)
   const [progress, setProg] = useState(0)
   const [duration, setDur] = useState(0)
   const audioRef = useRef<HTMLAudioElement>(null)
+
+  // Audio stems are always vocals.wav or no_vocals.wav
   const src = `${API}/download/${jobId}/${stem}`
 
   useEffect(() => {
@@ -70,7 +62,8 @@ function AudioPlayer({ jobId, stem, color }: { jobId: string, stem: string, colo
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         <button onClick={toggle} style={{
           width: 36, height: 36, borderRadius: '50%', border: 'none',
-          background: color, color: 'white', fontSize: 13, cursor: 'pointer', flexShrink: 0
+          background: color, color: 'white', fontSize: 13,
+          cursor: 'pointer', flexShrink: 0, fontWeight: 700
         }}>{playing ? 'II' : '>'}</button>
         <div onClick={seek} style={{
           flex: 1, height: 4, background: 'var(--border)', borderRadius: 2,
@@ -86,11 +79,11 @@ function AudioPlayer({ jobId, stem, color }: { jobId: string, stem: string, colo
   )
 }
 
-function VideoPlayer({ jobId, stem, color }: { jobId: string, stem: string, color: string }) {
+function VideoPlayer({ src, color }: { src: string, color: string }) {
   return (
     <div style={{ marginTop: 14 }}>
       <video
-        src={`${API}/download/${jobId}/${stem}`}
+        src={src}
         controls
         style={{ width: '100%', borderRadius: 10, border: `1px solid ${color}30`, background: '#000', maxHeight: 220 }}
       />
@@ -120,23 +113,6 @@ function ResultsContent() {
       .catch(() => setError('Results not ready or job not found.'))
   }, [jobId])
 
-  const getTracks = (): Track[] => {
-    const tracks: Track[] = []
-    if (outputFormat === 'audio' || outputFormat === 'both') {
-      tracks.push(
-        { label: 'Vocals', desc: 'Isolated vocal track (WAV)', color: '#22D3A0', icon: 'V', stem: 'vocals', type: 'audio', filename: 'vocals.wav' },
-        { label: 'Instrumental', desc: 'Backing track, no vocals (WAV)', color: '#A78BFA', icon: 'I', stem: 'no_vocals', type: 'audio', filename: 'instrumental.wav' },
-      )
-    }
-    if (isVideo && (outputFormat === 'video' || outputFormat === 'both')) {
-      tracks.push(
-        { label: 'Vocals Video', desc: 'Video with isolated vocals (MP4)', color: '#22D3A0', icon: 'VV', stem: 'vocals_video', type: 'video', filename: 'vocals_video.mp4' },
-        { label: 'Instrumental Video', desc: 'Video with vocals removed (MP4)', color: '#A78BFA', icon: 'IV', stem: 'no_vocals_video', type: 'video', filename: 'instrumental_video.mp4' },
-      )
-    }
-    return tracks
-  }
-
   if (error) return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '100px 24px' }}>
       <div style={{ textAlign: 'center' }}>
@@ -153,48 +129,70 @@ function ResultsContent() {
     </div>
   )
 
-  const tracks = getTracks()
+  // Audio stems — always vocals.wav and no_vocals.wav
+  const audioStems = [
+    { label: 'Vocals', desc: 'Isolated vocal track', color: '#22D3A0', stem: 'vocals', filename: 'vocals.wav' },
+    { label: 'Instrumental', desc: 'Backing track, no vocals', color: '#A78BFA', stem: 'no_vocals', filename: 'instrumental.wav' },
+  ]
+
+  // Video stems — vocals_video and no_vocals_video
+  const videoStems = [
+    { label: 'Vocals Video', desc: 'Video with only vocals audio', color: '#22D3A0', stem: 'vocals_video', filename: 'vocals_video.mp4' },
+    { label: 'Instrumental Video', desc: 'Video with vocals removed', color: '#A78BFA', stem: 'no_vocals_video', filename: 'instrumental_video.mp4' },
+  ]
+
+  const showAudio = outputFormat === 'audio' || outputFormat === 'both'
+  const showVideo = isVideo && (outputFormat === 'video' || outputFormat === 'both')
 
   return (
     <div style={{ minHeight: '100vh', position: 'relative' }}>
       <Navbar />
+
       <div style={{
         position: 'fixed', top: '20%', left: '50%', transform: 'translateX(-50%)',
         width: 500, height: 500,
         background: 'radial-gradient(circle, rgba(34,211,160,0.07) 0%, transparent 70%)',
         pointerEvents: 'none', zIndex: 0
       }} />
+
       <div style={{ maxWidth: 640, margin: '0 auto', padding: '110px 24px 80px', position: 'relative', zIndex: 1 }}>
+
+        {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
           <div style={{
             width: 68, height: 68, borderRadius: '50%',
             background: 'rgba(34,211,160,0.12)', border: '1px solid rgba(34,211,160,0.3)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 26, margin: '0 auto 18px', color: '#22D3A0', fontWeight: 800
-          }}>OK</div>
+            fontSize: 13, fontWeight: 800, color: '#22D3A0', margin: '0 auto 18px'
+          }}>DONE</div>
           <h1 style={{ fontFamily: 'Syne, sans-serif', fontSize: 32, fontWeight: 800, letterSpacing: '-1px', marginBottom: 8 }}>
             Processing complete
           </h1>
-          <p style={{ color: 'var(--muted)', fontSize: 15 }}>Your stems are ready. Choose your output format below.</p>
+          <p style={{ color: 'var(--muted)', fontSize: 15 }}>
+            Your stems are ready. {isVideo ? 'Choose your output format below.' : 'Download your audio stems.'}
+          </p>
         </div>
 
+        {/* Format selector — only for video uploads */}
         {isVideo && (
           <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 16, padding: 20, marginBottom: 28 }}>
-            <p style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 14, textTransform: 'uppercase', letterSpacing: 1, fontWeight: 600 }}>Output format</p>
+            <p style={{ fontSize: 12, color: 'var(--muted)', marginBottom: 14, textTransform: 'uppercase', letterSpacing: 1, fontWeight: 600 }}>
+              Choose output format
+            </p>
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
               {([
-                { key: 'audio', label: 'Audio only', desc: 'WAV stems' },
-                { key: 'video', label: 'Video only', desc: 'MP4 files' },
-                { key: 'both', label: 'Both', desc: 'Audio + Video' },
-              ] as { key: OutputFormat, label: string, desc: string }[]).map(opt => (
+                { key: 'audio' as OutputFormat, label: 'Audio only', desc: 'WAV files' },
+                { key: 'video' as OutputFormat, label: 'Video only', desc: 'MP4 files' },
+                { key: 'both' as OutputFormat, label: 'Both', desc: 'Audio + Video' },
+              ]).map(opt => (
                 <button key={opt.key} onClick={() => setOutputFormat(opt.key)} style={{
-                  flex: 1, minWidth: 100, padding: '12px 16px', borderRadius: 10, cursor: 'pointer',
+                  flex: 1, minWidth: 90, padding: '12px 14px', borderRadius: 10, cursor: 'pointer',
                   background: outputFormat === opt.key ? 'rgba(108,99,255,0.15)' : 'transparent',
-                  border: `1px solid ${outputFormat === opt.key ? 'rgba(108,99,255,0.4)' : 'var(--border)'}`,
+                  border: `1px solid ${outputFormat === opt.key ? 'rgba(108,99,255,0.5)' : 'var(--border)'}`,
                   color: outputFormat === opt.key ? 'var(--accent2)' : 'var(--muted)',
                   transition: 'all 0.2s ease', textAlign: 'center'
                 }}>
-                  <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 2 }}>{opt.label}</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 2 }}>{opt.label}</div>
                   <div style={{ fontSize: 11, opacity: 0.7 }}>{opt.desc}</div>
                 </button>
               ))}
@@ -202,45 +200,108 @@ function ResultsContent() {
           </div>
         )}
 
-        {tracks.map((track, idx) => (
-          <div key={`${track.stem}-${idx}`} className="card" style={{ padding: 24, marginBottom: 16 }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <div style={{
-                  width: 42, height: 42, borderRadius: 11,
-                  background: `${track.color}15`, border: `1px solid ${track.color}35`,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 11, fontWeight: 800, color: track.color
-                }}>{track.icon}</div>
-                <div>
-                  <h3 style={{ fontFamily: 'Syne, sans-serif', fontSize: 16, fontWeight: 700 }}>{track.label}</h3>
-                  <p style={{ color: 'var(--muted)', fontSize: 12 }}>{track.desc}</p>
+        {/* AUDIO SECTION */}
+        {showAudio && (
+          <div style={{ marginBottom: 28 }}>
+            {isVideo && (
+              <p style={{ fontSize: 12, color: 'var(--accent2)', textTransform: 'uppercase', letterSpacing: 1, fontWeight: 600, marginBottom: 14 }}>
+                Audio stems (WAV)
+              </p>
+            )}
+            {audioStems.map(track => (
+              <div key={track.stem} className="card" style={{ padding: 24, marginBottom: 14 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div style={{
+                      width: 42, height: 42, borderRadius: 11,
+                      background: `${track.color}15`, border: `1px solid ${track.color}35`,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 10, fontWeight: 800, color: track.color, letterSpacing: 0.5
+                    }}>WAV</div>
+                    <div>
+                      <h3 style={{ fontFamily: 'Syne, sans-serif', fontSize: 16, fontWeight: 700 }}>{track.label}</h3>
+                      <p style={{ color: 'var(--muted)', fontSize: 12 }}>{track.desc}</p>
+                    </div>
+                  </div>
+                  {/* Download audio WAV */}
+                  <a
+                    href={`${API}/download/${jobId}/${track.stem}`}
+                    download={track.filename}
+                    style={{ textDecoration: 'none' }}
+                  >
+                    <button style={{
+                      padding: '7px 14px', borderRadius: 8, fontSize: 12,
+                      background: `${track.color}15`, border: `1px solid ${track.color}35`,
+                      color: track.color, cursor: 'pointer', fontWeight: 600
+                    }}>
+                      Download WAV
+                    </button>
+                  </a>
                 </div>
+                <AudioPlayer jobId={jobId!} stem={track.stem} color={track.color} />
               </div>
-              <a href={`${API}/download/${jobId}/${track.stem}`} download={track.filename} style={{ textDecoration: 'none' }}>
-                <button style={{
-                  padding: '7px 14px', borderRadius: 8, fontSize: 12,
-                  background: `${track.color}15`, border: `1px solid ${track.color}35`,
-                  color: track.color, cursor: 'pointer', fontWeight: 600
-                }}>
-                  Download {track.type === 'video' ? 'MP4' : 'WAV'}
-                </button>
-              </a>
-            </div>
-            {track.type === 'video'
-              ? <VideoPlayer jobId={jobId!} stem={track.stem} color={track.color} />
-              : <AudioPlayer jobId={jobId!} stem={track.stem} color={track.color} />
-            }
+            ))}
           </div>
-        ))}
+        )}
 
-        <div style={{ padding: '12px 18px', borderRadius: 10, marginBottom: 28, background: 'var(--surface)', border: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        {/* VIDEO SECTION */}
+        {showVideo && (
+          <div style={{ marginBottom: 28 }}>
+            <p style={{ fontSize: 12, color: 'var(--accent2)', textTransform: 'uppercase', letterSpacing: 1, fontWeight: 600, marginBottom: 14 }}>
+              Video stems (MP4)
+            </p>
+            {videoStems.map(track => {
+              const videoSrc = `${API}/download/${jobId}/${track.stem}`
+              return (
+                <div key={track.stem} className="card" style={{ padding: 24, marginBottom: 14 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                      <div style={{
+                        width: 42, height: 42, borderRadius: 11,
+                        background: `${track.color}15`, border: `1px solid ${track.color}35`,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: 10, fontWeight: 800, color: track.color, letterSpacing: 0.5
+                      }}>MP4</div>
+                      <div>
+                        <h3 style={{ fontFamily: 'Syne, sans-serif', fontSize: 16, fontWeight: 700 }}>{track.label}</h3>
+                        <p style={{ color: 'var(--muted)', fontSize: 12 }}>{track.desc}</p>
+                      </div>
+                    </div>
+                    {/* Download video MP4 */}
+                    <a
+                      href={videoSrc}
+                      download={track.filename}
+                      style={{ textDecoration: 'none' }}
+                    >
+                      <button style={{
+                        padding: '7px 14px', borderRadius: 8, fontSize: 12,
+                        background: `${track.color}15`, border: `1px solid ${track.color}35`,
+                        color: track.color, cursor: 'pointer', fontWeight: 600
+                      }}>
+                        Download MP4
+                      </button>
+                    </a>
+                  </div>
+                  <VideoPlayer src={videoSrc} color={track.color} />
+                </div>
+              )
+            })}
+          </div>
+        )}
+
+        {/* Job ID */}
+        <div style={{
+          padding: '12px 18px', borderRadius: 10, marginBottom: 28,
+          background: 'var(--surface)', border: '1px solid var(--border)',
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+        }}>
           <span style={{ color: 'var(--muted)', fontSize: 12 }}>Job ID</span>
           <code style={{ fontSize: 11, color: 'var(--accent2)', fontFamily: 'monospace' }}>{jobId}</code>
         </div>
 
         <div style={{ textAlign: 'center' }}>
-          <button className="btn-primary" onClick={() => router.push('/')} style={{ padding: '14px 36px', borderRadius: 12, fontSize: 15 }}>
+          <button className="btn-primary" onClick={() => router.push('/')}
+            style={{ padding: '14px 36px', borderRadius: 12, fontSize: 15 }}>
             Process another track
           </button>
         </div>
