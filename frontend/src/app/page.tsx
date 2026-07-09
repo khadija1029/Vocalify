@@ -376,10 +376,6 @@ export default function Home() {
             </div>
             <span style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 15, color: 'var(--text)' }}>Vocalify</span>
           </div>
-          <div style={{ display: 'flex', gap: 20 }}>
-            <button onClick={() => scrollTo(uploadRef)} style={{ background: 'none', border: 'none', fontSize: 13, color: 'var(--muted)', cursor: 'pointer' }}>Extract</button>
-            <button onClick={() => scrollTo(aboutRef)} style={{ background: 'none', border: 'none', fontSize: 13, color: 'var(--muted)', cursor: 'pointer' }}>About</button>
-          </div>
           <p style={{ fontSize: 12, color: 'var(--muted)' }}>2026 Vocalify · Powered by Meta Demucs</p>
         </div>
       </footer>
