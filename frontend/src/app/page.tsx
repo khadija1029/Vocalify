@@ -139,23 +139,23 @@ export default function Home() {
         {/* Waveform demo */}
 <div style={{
   display: 'flex', alignItems: 'center', gap: 8, marginBottom: 44,
-  padding: '12px 14px', background: 'var(--surface)',
+  padding: '12px 16px', background: 'var(--surface)',
   border: '1px solid var(--border)', borderRadius: 14,
-  width: '100%', maxWidth: 480, overflow: 'hidden', flexWrap: 'nowrap'
+  width: '100%', maxWidth: 480, overflow: 'hidden'
 }}>
-  <div style={{ flexShrink: 0 }}>
+  <div style={{ display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
     <div style={{ fontSize: 9, color: 'var(--muted)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: 1 }}>Original</div>
-    <WaveformIcon color="#6B8090" small />
+    <WaveformIcon color="#6B8090" />
   </div>
-  <div style={{ color: 'var(--muted)', fontSize: 13, flexShrink: 0 }}>to</div>
-  <div style={{ flexShrink: 0 }}>
+  <div style={{ color: 'var(--muted)', fontSize: 13, flexShrink: 0, marginTop: 14 }}>to</div>
+  <div style={{ display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
     <div style={{ fontSize: 9, color: '#7FBDB5', marginBottom: 4, textTransform: 'uppercase', letterSpacing: 1 }}>Vocals</div>
-    <WaveformIcon color="#7FBDB5" animated small />
+    <WaveformIcon color="#7FBDB5" animated />
   </div>
-  <div style={{ width: 1, height: 28, background: 'var(--border)', flexShrink: 0 }} />
-  <div style={{ flexShrink: 0 }}>
+  <div style={{ width: 1, height: 28, background: 'var(--border)', flexShrink: 0, marginTop: 14 }} />
+  <div style={{ display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
     <div style={{ fontSize: 9, color: '#F6D69B', marginBottom: 4, textTransform: 'uppercase', letterSpacing: 1 }}>Instrumental</div>
-    <WaveformIcon color="#F6D69B" animated small />
+    <WaveformIcon color="#F6D69B" animated />
   </div>
 </div>
 
