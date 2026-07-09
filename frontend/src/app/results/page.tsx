@@ -368,10 +368,10 @@ function ResultsContent() {
 export default function ResultsPage() {
   return (
     <Suspense fallback={
-      <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <p style={{ color: 'var(--muted)' }}>Loading...</p>
-      </div>
-    }>
+  <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <p style={{ color: '#1aa895' }}>Loading...</p>
+  </div>
+}>
       <ResultsContent />
     </Suspense>
   )
