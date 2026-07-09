@@ -10,7 +10,7 @@ const MAX_MB = 200
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'
 
 const WaveformIcon = ({ color = '#7FBDB5', animated = false }: { color?: string; animated?: boolean }) => (
-  <div style={{ display: 'flex', alignItems: 'center', gap: 2, height: 36 }}>
+  <div style={{ display: 'flex', alignItems: 'center', gap: 3, height: 36 }}>
    {[4, 7, 5, 9, 6, 8, 4, 7, 5, 9, 6].map((h, i) => (
       <div key={i} className={animated ? 'waveform-bar' : ''} style={{
         width: 3, height: h * 3.5, background: color, borderRadius: 2,
