@@ -366,29 +366,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CTA */}
-      <section style={{ padding: '80px 24px', position: 'relative', zIndex: 1 }}>
-        <div style={{
-          maxWidth: 600, margin: '0 auto', textAlign: 'center', padding: '60px 36px',
-          background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 24,
-          position: 'relative', overflow: 'hidden'
-        }}>
-          <div style={{
-            position: 'absolute', top: '-50%', left: '50%', transform: 'translateX(-50%)',
-            width: 400, height: 300, pointerEvents: 'none',
-            background: 'radial-gradient(circle, rgba(127,189,181,0.08) 0%, transparent 70%)'
-          }} />
-          <h2 style={{ fontFamily: 'Syne, sans-serif', fontSize: 'clamp(26px, 4vw, 38px)', fontWeight: 800, letterSpacing: '-0.03em', marginBottom: 12, position: 'relative' }}>
-            Ready to extract?
-          </h2>
-          <p style={{ color: 'var(--muted)', marginBottom: 28, fontSize: 15, lineHeight: 1.6, position: 'relative' }}>
-            Drop your track or video and get professional stems in minutes.
-          </p>
-          <button className="btn-primary" onClick={() => scrollTo(uploadRef)} style={{ padding: '14px 40px', borderRadius: 12, fontSize: 15, position: 'relative' }}>
-            Start extracting
-          </button>
-        </div>
-      </section>
 
       {/* FOOTER */}
       <footer style={{ borderTop: '1px solid var(--border)', padding: '32px 24px', position: 'relative', zIndex: 1 }}>
