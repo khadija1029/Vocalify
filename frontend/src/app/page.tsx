@@ -353,7 +353,7 @@ export default function Home() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 1, background: 'var(--border)', borderRadius: 16, overflow: 'hidden', border: '1px solid var(--border)' }}>
             {[
               { n: '4', l: 'Stem types', c: '#7FBDB5' },
-              { n: '200MB', l: 'Max file size', c: '#F6D69B' },
+              { n: '200', l: 'Max file size', c: '#F6D69B' },
               { n: '100%', l: 'Free to use', c: '#FF8A63' },
               { n: '0', l: 'Accounts needed', c: '#A78BB7' },
             ].map((s, i) => (
@@ -369,7 +369,7 @@ export default function Home() {
 
       {/* FOOTER */}
       <footer style={{ borderTop: '1px solid var(--border)', padding: '32px 24px', position: 'relative', zIndex: 1 }}>
-        <div style={{ maxWidth: 960, margin: '0 auto', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 20, alignItems: 'center' }}>
+        <div style={{ maxWidth: 960, margin: '0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, textAlign: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{ width: 26, height: 26, background: 'linear-gradient(135deg, #7FBDB5, #F6D69B)', borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1.5 }}>
               {[2,3,2,4,2].map((h, i) => (<div key={i} style={{ width: 2, height: h * 3, background: '#0D1117', borderRadius: 1 }} />))}
