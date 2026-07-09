@@ -10,8 +10,8 @@ const MAX_MB = 200
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'
 
 const WaveformIcon = ({ color = '#7FBDB5', animated = false }: { color?: string; animated?: boolean }) => (
-  <div style={{ display: 'flex', alignItems: 'center', gap: 3, height: 36 }}>
-    {[4, 7, 5, 9, 6, 8, 4, 7, 5, 9, 6, 8, 4].map((h, i) => (
+  <div style={{ display: 'flex', alignItems: 'center', gap: 2, height: 36 }}>
+   {[4, 7, 5, 9, 6, 8, 4, 7, 5, 9, 6].map((h, i) => (
       <div key={i} className={animated ? 'waveform-bar' : ''} style={{
         width: 3, height: h * 3.5, background: color, borderRadius: 2,
         animationDelay: `${i * 0.1}s`, opacity: animated ? 1 : 0.5 + (i % 3) * 0.2
@@ -134,10 +134,10 @@ export default function Home() {
 
         {/* Waveform demo */}
         <div style={{
-          display: 'flex', alignItems: 'center', gap: 20, marginBottom: 44,
-          padding: '16px 28px', background: 'var(--surface)',
+          display: 'flex', alignItems: 'center', gap: 12, marginBottom: 44,
+          padding: '14px 16px', background: 'var(--surface)',
           border: '1px solid var(--border)', borderRadius: 14,
-          marginLeft: 8 , marginRight:8 
+          width: '100%', maxWidth: 480, overflow: 'hidden'
         }}>
           <div>
             <div style={{ fontSize: 10, color: 'var(--muted)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: 1 }}>Original</div>
