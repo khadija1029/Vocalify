@@ -242,7 +242,7 @@ export default function Home() {
           <button className="btn-primary glow" onClick={handleUpload} disabled={!file || uploading} style={{
             width: '100%', padding: '14px', borderRadius: 12, fontSize: 15
           }}>
-            {uploading ? 'Uploading...' : file ? `Extract from ${fileType}` : 'Choose a file to get started'}
+            {uploading ? 'Processing...' : file ? `Extract from ${fileType}` : 'Choose a file to get started'}
           </button>
 
           <p style={{ textAlign: 'center', marginTop: 10, fontSize: 12, color: 'var(--muted)' }}>
