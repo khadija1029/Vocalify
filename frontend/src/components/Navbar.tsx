@@ -38,15 +38,6 @@ export default function Navbar({ onUploadClick, onAboutClick }: NavbarProps) {
 
       {isHome && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          <button onClick={onUploadClick} style={{
-            padding: '7px 16px', borderRadius: 8, fontSize: 13, fontWeight: 500,
-            background: 'transparent', border: 'none', color: 'var(--muted)', cursor: 'pointer',
-            transition: 'color 0.2s', fontFamily: 'Inter, sans-serif'
-          }}
-            onMouseEnter={e => (e.currentTarget.style.color = 'var(--text)')}
-            onMouseLeave={e => (e.currentTarget.style.color = 'var(--muted)')}>
-            Extract
-          </button>
           <button onClick={onAboutClick} style={{
             padding: '7px 16px', borderRadius: 8, fontSize: 13, fontWeight: 500,
             background: 'transparent', border: 'none', color: 'var(--muted)', cursor: 'pointer',
