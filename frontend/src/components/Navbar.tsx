@@ -14,73 +14,61 @@ export default function Navbar({ onUploadClick, onAboutClick }: NavbarProps) {
   return (
     <nav style={{
       position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50,
-      padding: '0 32px',
-      background: 'rgba(8,10,15,0.85)',
-      backdropFilter: 'blur(24px)',
+      height: 64,
+      background: 'rgba(13,17,23,0.85)',
+      backdropFilter: 'blur(20px)',
       borderBottom: '1px solid var(--border)',
-      height: '64px',
-      display: 'flex', alignItems: 'center', justifyContent: 'space-between'
+      display: 'flex', alignItems: 'center',
+      padding: '0 28px',
+      justifyContent: 'space-between'
     }}>
-      {/* Logo */}
-      <Link href="/" style={{ textDecoration: 'none' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{
-            width: 32, height: 32,
-            background: 'linear-gradient(135deg, #6C63FF, #22D3A0)',
-            borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2
-          }}>
-            {[3,5,4,6,3].map((h, i) => (
-              <div key={i} style={{ width: 3, height: h * 3, background: 'white', borderRadius: 2, opacity: 0.9 }} />
-            ))}
-          </div>
-          <span style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 20, color: 'var(--text)', letterSpacing: '-0.5px' }}>
-            Vocalify
-          </span>
+      <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{
+          width: 30, height: 30,
+          background: 'linear-gradient(135deg, #7FBDB5, #F6D69B)',
+          borderRadius: 8,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2
+        }}>
+          {[2,4,3,5,2].map((h, i) => (
+            <div key={i} style={{ width: 2.5, height: h * 3.5, background: '#0D1117', borderRadius: 2 }} />
+          ))}
         </div>
+        <span style={{ fontSize: 16, fontWeight: 800, color: 'var(--text)', letterSpacing: '-0.03em', fontFamily: 'Syne, sans-serif' }}>Vocalify</span>
       </Link>
 
-      {/* Nav links — only on home */}
       {isHome && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
           <button onClick={onUploadClick} style={{
-            padding: '7px 16px', borderRadius: 8, fontSize: 14, fontWeight: 500,
+            padding: '7px 16px', borderRadius: 8, fontSize: 13, fontWeight: 500,
             background: 'transparent', border: 'none', color: 'var(--muted)', cursor: 'pointer',
-            transition: 'color 0.2s'
+            transition: 'color 0.2s', fontFamily: 'Inter, sans-serif'
           }}
             onMouseEnter={e => (e.currentTarget.style.color = 'var(--text)')}
             onMouseLeave={e => (e.currentTarget.style.color = 'var(--muted)')}>
             Extract
           </button>
           <button onClick={onAboutClick} style={{
-            padding: '7px 16px', borderRadius: 8, fontSize: 14, fontWeight: 500,
+            padding: '7px 16px', borderRadius: 8, fontSize: 13, fontWeight: 500,
             background: 'transparent', border: 'none', color: 'var(--muted)', cursor: 'pointer',
-            transition: 'color 0.2s'
+            transition: 'color 0.2s', fontFamily: 'Inter, sans-serif'
           }}
             onMouseEnter={e => (e.currentTarget.style.color = 'var(--text)')}
             onMouseLeave={e => (e.currentTarget.style.color = 'var(--muted)')}>
             About
           </button>
-          <button onClick={onUploadClick} style={{
-            padding: '8px 20px', borderRadius: 8, fontSize: 14,
-            background: 'linear-gradient(135deg, #6C63FF, #A78BFA)',
-            border: 'none', color: 'white', cursor: 'pointer', fontFamily: 'Syne, sans-serif', fontWeight: 600,
-            transition: 'all 0.2s ease', marginLeft: 4
-          }}
-            onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(108,99,255,0.35)' }}
-            onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none' }}>
+          <button onClick={onUploadClick} className="btn-primary" style={{
+            padding: '8px 20px', borderRadius: 8, fontSize: 13, marginLeft: 4
+          }}>
             Upload
           </button>
         </div>
       )}
 
-      {/* Back button on other pages */}
       {!isHome && (
         <Link href="/" style={{ textDecoration: 'none' }}>
-          <button style={{
-            padding: '8px 16px', borderRadius: 8, fontSize: 14,
-            background: 'transparent', border: '1px solid var(--border)',
-            color: 'var(--text)', cursor: 'pointer'
-          }}>← Home</button>
+          <button className="btn-outline" style={{ padding: '7px 16px', borderRadius: 8, fontSize: 13 }}>
+            Back
+          </button>
         </Link>
       )}
     </nav>
