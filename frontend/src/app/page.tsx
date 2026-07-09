@@ -136,7 +136,8 @@ export default function Home() {
         <div style={{
           display: 'flex', alignItems: 'center', gap: 20, marginBottom: 44,
           padding: '16px 28px', background: 'var(--surface)',
-          border: '1px solid var(--border)', borderRadius: 14
+          border: '1px solid var(--border)', borderRadius: 14,
+          marginLeft: 8 , marginRight:8 
         }}>
           <div>
             <div style={{ fontSize: 10, color: 'var(--muted)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: 1 }}>Original</div>
