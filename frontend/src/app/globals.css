@@ -4,10 +4,10 @@
 @tailwind utilities;
 
 :root {
-  --bg: #0D1117;
-  --surface: #131920;
-  --surface2: #1A2330;
-  --border: #1E2D3D;
+  --bg: #0A1A18;
+  --surface: #0F2220;
+  --surface2: #152B28;
+  --border: #1E3632;
   --accent: #7FBDB5;
   --accent2: #A8D5D0;
   --green: #7FBDB5;
@@ -19,8 +19,8 @@
   --purple: #A78BB7;
   --purple-dark: #6B3D8A;
   --gray: #B8C4CC;
-  --text: #E8EFF5;
-  --muted: #6B8090;
+  --text: #E8F5F3;
+  --muted: #5E8A84;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -44,7 +44,6 @@ h1, h2, h3, h4 {
   line-height: 1.2;
 }
 
-/* Gradient text using teal */
 .gradient-text {
   background: linear-gradient(135deg, #7FBDB5 0%, #A8D5D0 40%, #F6D69B 100%);
   -webkit-background-clip: text;
@@ -52,7 +51,6 @@ h1, h2, h3, h4 {
   background-clip: text;
 }
 
-/* Waveform animation */
 @keyframes wave {
   0%, 100% { transform: scaleY(0.4); }
   50% { transform: scaleY(1); }
@@ -62,14 +60,12 @@ h1, h2, h3, h4 {
   transform-origin: bottom;
 }
 
-/* Glow pulse using teal */
 @keyframes glow-pulse {
   0%, 100% { box-shadow: 0 0 20px rgba(127,189,181,0.2); }
   50% { box-shadow: 0 0 50px rgba(127,189,181,0.5); }
 }
 .glow { animation: glow-pulse 2s ease-in-out infinite; }
 
-/* Noise texture overlay */
 .noise::before {
   content: '';
   position: fixed;
@@ -80,7 +76,6 @@ h1, h2, h3, h4 {
   opacity: 0.4;
 }
 
-/* Upload zone */
 .upload-zone {
   border: 2px dashed var(--border);
   transition: all 0.3s ease;
@@ -90,10 +85,9 @@ h1, h2, h3, h4 {
   background: rgba(127,189,181,0.05);
 }
 
-/* Button styles */
 .btn-primary {
   background: linear-gradient(135deg, #7FBDB5, #A8D5D0);
-  color: #0D1117;
+  color: #0A1A18;
   border: none;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -125,7 +119,6 @@ h1, h2, h3, h4 {
   color: var(--accent2);
 }
 
-/* Progress bar - teal to gold */
 @keyframes progress-shine {
   0% { background-position: -200% center; }
   100% { background-position: 200% center; }
@@ -136,19 +129,16 @@ h1, h2, h3, h4 {
   animation: progress-shine 2s linear infinite;
 }
 
-/* Card */
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 16px;
-  transition: border-color 0.2s ease;
+  transition: border-color 0.2s ease, transform 0.2s ease;
 }
 .card:hover { border-color: rgba(127,189,181,0.3); }
 
-/* Scrollbar */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
-/* Selection */
 ::selection { background: rgba(127,189,181,0.2); }
