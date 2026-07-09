@@ -274,7 +274,7 @@ export default function Home() {
       </section>
 
       {/* FEATURES */}
-      <section style={{ padding: '90px 24px', borderTop: '1px solid var(--border)', position: 'relative', zIndex: 1 }}>
+      <section style={{ padding: '48px 24px', borderTop: '1px solid var(--border)', position: 'relative', zIndex: 1 }}>
         <div style={{ maxWidth: 960, margin: '0 auto' }}>
           <p style={{ textAlign: 'center', fontSize: 11, color: '#7FBDB5', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 12, fontWeight: 600 }}>What you get</p>
           <h2 style={{ fontFamily: 'Syne, sans-serif', fontSize: 'clamp(28px, 4vw, 40px)', fontWeight: 800, textAlign: 'center', marginBottom: 48, letterSpacing: '-0.03em' }}>
@@ -299,7 +299,7 @@ export default function Home() {
       </section>
 
       {/* HOW IT WORKS */}
-      <section style={{ padding: '90px 24px', position: 'relative', zIndex: 1 }}>
+      <section style={{ padding: '48px 24px', position: 'relative', zIndex: 1 }}>
         <div style={{ maxWidth: 720, margin: '0 auto' }}>
           <p style={{ textAlign: 'center', fontSize: 11, color: '#F6D69B', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 12, fontWeight: 600 }}>How it works</p>
           <h2 style={{ fontFamily: 'Syne, sans-serif', fontSize: 'clamp(28px, 4vw, 40px)', fontWeight: 800, textAlign: 'center', marginBottom: 48, letterSpacing: '-0.03em' }}>
@@ -324,7 +324,7 @@ export default function Home() {
       </section>
 
       {/* ABOUT */}
-      <section ref={aboutRef} style={{ padding: '90px 24px', borderTop: '1px solid var(--border)', position: 'relative', zIndex: 1 }}>
+      <section ref={aboutRef} style={{ padding: '48px 24px', borderTop: '1px solid var(--border)', position: 'relative', zIndex: 1 }}>
         <div style={{ maxWidth: 960, margin: '0 auto' }}>
           <p style={{ textAlign: 'center', fontSize: 11, color: '#A78BB7', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 12, fontWeight: 600 }}>About Vocalify</p>
           <h2 style={{ fontFamily: 'Syne, sans-serif', fontSize: 'clamp(28px, 4vw, 40px)', fontWeight: 800, textAlign: 'center', marginBottom: 16, letterSpacing: '-0.03em' }}>
