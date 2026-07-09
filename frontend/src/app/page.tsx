@@ -9,11 +9,15 @@ const ALL_ACCEPTED = [...ACCEPTED_AUDIO, ...ACCEPTED_VIDEO]
 const MAX_MB = 200
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'
 
-const WaveformIcon = ({ color = '#7FBDB5', animated = false }: { color?: string; animated?: boolean }) => (
-  <div style={{ display: 'flex', alignItems: 'center', gap: 3, height: 36 }}>
-   {[4, 7, 5, 9, 6, 8, 4, 7, 5, 9, 6].map((h, i) => (
+const WaveformIcon = ({ color = '#7FBDB5', animated = false, small = false }: { 
+  color?: string; animated?: boolean; small?: boolean 
+}) => (
+  <div style={{ display: 'flex', alignItems: 'center', gap: small ? 2 : 3, height: small ? 24 : 36 }}>
+    {[4, 7, 5, 9, 6, 8, 4, 7, 5, 9, 6].map((h, i) => (
       <div key={i} className={animated ? 'waveform-bar' : ''} style={{
-        width: 3, height: h * 3.5, background: color, borderRadius: 2,
+        width: small ? 2 : 3,
+        height: h * (small ? 2 : 3.5),
+        background: color, borderRadius: 2,
         animationDelay: `${i * 0.1}s`, opacity: animated ? 1 : 0.5 + (i % 3) * 0.2
       }} />
     ))}
@@ -133,27 +137,27 @@ export default function Home() {
         </p>
 
         {/* Waveform demo */}
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: 12, marginBottom: 44,
-          padding: '14px 16px', background: 'var(--surface)',
-          border: '1px solid var(--border)', borderRadius: 14,
-          width: '100%', maxWidth: 480, overflow: 'hidden'
-        }}>
-          <div>
-            <div style={{ fontSize: 10, color: 'var(--muted)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: 1 }}>Original</div>
-            <WaveformIcon color="#6B8090" />
-          </div>
-          <div style={{ color: 'var(--muted)', fontSize: 16 }}>to</div>
-          <div>
-            <div style={{ fontSize: 10, color: '#7FBDB5', marginBottom: 4, textTransform: 'uppercase', letterSpacing: 1 }}>Vocals</div>
-            <WaveformIcon color="#7FBDB5" animated />
-          </div>
-          <div style={{ width: 1, height: 36, background: 'var(--border)' }} />
-          <div>
-            <div style={{ fontSize: 10, color: '#F6D69B', marginBottom: 4, textTransform: 'uppercase', letterSpacing: 1 }}>Instrumental</div>
-            <WaveformIcon color="#F6D69B" animated />
-          </div>
-        </div>
+<div style={{
+  display: 'flex', alignItems: 'center', gap: 8, marginBottom: 44,
+  padding: '12px 14px', background: 'var(--surface)',
+  border: '1px solid var(--border)', borderRadius: 14,
+  width: '100%', maxWidth: 480, overflow: 'hidden', flexWrap: 'nowrap'
+}}>
+  <div style={{ flexShrink: 0 }}>
+    <div style={{ fontSize: 9, color: 'var(--muted)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: 1 }}>Original</div>
+    <WaveformIcon color="#6B8090" small />
+  </div>
+  <div style={{ color: 'var(--muted)', fontSize: 13, flexShrink: 0 }}>to</div>
+  <div style={{ flexShrink: 0 }}>
+    <div style={{ fontSize: 9, color: '#7FBDB5', marginBottom: 4, textTransform: 'uppercase', letterSpacing: 1 }}>Vocals</div>
+    <WaveformIcon color="#7FBDB5" animated small />
+  </div>
+  <div style={{ width: 1, height: 28, background: 'var(--border)', flexShrink: 0 }} />
+  <div style={{ flexShrink: 0 }}>
+    <div style={{ fontSize: 9, color: '#F6D69B', marginBottom: 4, textTransform: 'uppercase', letterSpacing: 1 }}>Instrumental</div>
+    <WaveformIcon color="#F6D69B" animated small />
+  </div>
+</div>
 
         {/* Upload box */}
         <div ref={uploadRef} style={{ width: '100%', maxWidth: 520 }}>
